@@ -62,7 +62,7 @@ def source_message(video_info: VideoInfo) -> None:
     table.add_row("Source", f"{video_info.source_name}")
     table.add_row("Size", f"{video_info.width} x {video_info.height}")
     table.add_row("Total Frames", f"{video_info.total_frames}") if video_info.total_frames is not None else None
-    table.add_row("FPS", f"{video_info.fps:.2f}")
+    table.add_row("Frame Rate", f"{video_info.fps:.2f} FPS")
     
     print()
     print(table)
