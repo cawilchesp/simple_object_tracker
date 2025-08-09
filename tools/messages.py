@@ -39,6 +39,14 @@ def white(text: str) -> str:
 
 # Funciones
 # ---------
+# def step_message(step: str = None, message: str = None):
+#     step_text = green(f"[{step}]") if step != "Error" else red(f"[{step}]")
+#     print(f"{step_text} {message}")
+
+def step_message(step: str = None, message: str = None):
+    print(f"\n[green]\[{step}][/green] {message} :white_check_mark:")
+
+
 def source_message(video_info: VideoInfo) -> None:
     """Display video source information in a formatted table.
     Args:
@@ -48,15 +56,15 @@ def source_message(video_info: VideoInfo) -> None:
         Column(justify="left", style="bold green"),
         Column(justify="left", style="white", no_wrap=True),
         title="Video Source Information",
-        show_header=False, 
-        box=box.HORIZONTALS
-    )
+        show_header=False,
+        box=box.HORIZONTALS )
 
     table.add_row("Source", f"{video_info.source_name}")
     table.add_row("Size", f"{video_info.width} x {video_info.height}")
     table.add_row("Total Frames", f"{video_info.total_frames}") if video_info.total_frames is not None else None
     table.add_row("FPS", f"{video_info.fps:.2f}")
     
+    print()
     print(table)
 
 
@@ -116,8 +124,3 @@ def times_message(frame_number: int, total_frames: int, fps_value: float, times:
         f"{fps_value:8.2f}     "
         f"{hours_process:8.0f}h {minutes_process:.0f}m  ",
         end="", flush=True )
-    
-
-def step_message(step: str = None, message: str = None):
-    step_text = green(f"[{step}]") if step != "Error" else red(f"[{step}]")
-    print(f"{step_text} {message}")
