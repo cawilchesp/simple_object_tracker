@@ -1,44 +1,14 @@
 from modules.capture import VideoInfo
 from pathlib import Path
 
-from rich.table import Table, Column
 from rich import print, box
+from rich.table import Table, Column
+
 
 
 from icecream import ic
 
-# Constants
-# ---------
-FG_RED = '\033[31m'
-FG_GREEN = '\033[32m'
-FG_YELLOW = '\033[33m'
-FG_BLUE = '\033[34m'
-FG_WHITE = '\033[37m'
-FG_BOLD = '\033[01m'
-FG_RESET = '\033[0m'
 
-# Funciones de color
-# ------------------
-def bold(text: str) -> str:
-    return f"{FG_BOLD}{text}{FG_RESET}" if text is not None else ''
-
-def red(text: str) -> str:
-    return f"{FG_RED}{text}{FG_RESET}" if text is not None else ''
-
-def green(text: str) -> str:
-    return f"{FG_GREEN}{text}{FG_RESET}" if text is not None else ''
-
-def yellow(text: str) -> str:
-    return f"{FG_YELLOW}{text}{FG_RESET}" if text is not None else ''
-
-def blue(text: str) -> str:
-    return f"{FG_BLUE}{text}{FG_RESET}" if text is not None else ''
-
-def white(text: str) -> str:
-    return f"{FG_WHITE}{text}{FG_RESET}" if text is not None else ''
-
-# Funciones
-# ---------
 def step_message(step: str = None, message: str = None) -> None:
     """Display a message with a progress step number.
     Args:
@@ -68,27 +38,35 @@ def source_message(video_info: VideoInfo) -> None:
     print(table)
 
 
-def progress_message(frame_number: int, total_frames: int, fps_value: float):
+def progress_table(frame_number: int, total_frames: int, fps_value: float):
     if total_frames is not None:
-        percentage_title = f"{'':11}"
         percentage = f"[ {frame_number/total_frames:6.1%} ] "
         frame_progress = f"{frame_number} / {total_frames}"
         
         seconds = (total_frames-frame_number) / fps_value  if fps_value != 0 else 0
         hours_process = f"{(seconds // 3600):8.0f}"
         minutes_process = f"{((seconds % 3600) // 60):.0f}"
+        seconds_process = f"{(seconds % 60):.2f}"
     else:
-        percentage_title = ''
         percentage = ''
         frame_progress = f"{frame_number}"
-        hours_process = '        -'
+        hours_process = '-'
         minutes_process = '-'
+        seconds_process = '-'
     
-    frame_text_length = (2 * len(str(total_frames))) + 3
-    if frame_number == 0:
-        print(f"\n{percentage_title}{bold('Frame'):>{frame_text_length+9}}{bold('FPS'):>22}{bold('Est. End (h)'):>27}")
-    print(f"\r{green(percentage)}{frame_progress:>{frame_text_length}}     {fps_value:8.2f}     {hours_process}h {minutes_process}m  ", end="", flush=True)
+
+    table = Table(
+        Column(justify="left", style="bold green"),
+        Column('Frame', justify="right", style="white", no_wrap=True),
+        Column('FPS', justify="right", style="white"),
+        Column('Time to End', justify="right", style="white"),
+        title="Progress Information",
+        box=box.HORIZONTALS )
+    table.add_row(f"{percentage}",f"{frame_progress}",f"{fps_value:8.2f}", f"{hours_process}h {minutes_process}m {seconds_process}s")
     
+    return table
+
+
 
 def times_message(frame_number: int, total_frames: int, fps_value: float, times: dict):
     if total_frames is not None:
