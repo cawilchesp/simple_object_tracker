@@ -39,13 +39,13 @@ def white(text: str) -> str:
 
 # Funciones
 # ---------
-# def step_message(step: str = None, message: str = None):
-#     step_text = green(f"[{step}]") if step != "Error" else red(f"[{step}]")
-#     print(f"{step_text} {message}")
-
-def step_message(step: str = None, message: str = None):
-    print(f"\n[green]\[{step}][/green] {message} :white_check_mark:")
-
+def step_message(step: str = None, message: str = None) -> None:
+    """Display a message with a progress step number.
+    Args:
+        step (str): The step number or identifier.
+        message (str): The message to display.
+    """
+    print(f"\n[green]\[{step}][/green] {message}")
 
 def source_message(video_info: VideoInfo) -> None:
     """Display video source information in a formatted table.
