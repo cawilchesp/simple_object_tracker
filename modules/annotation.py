@@ -6,9 +6,6 @@ from collections import defaultdict, deque
 
 from tools.general import FPSMonitor
 
-# For debugging
-from icecream import ic
-
 
 class Trace:
     """Class to store and manage object tracking points.
