@@ -37,6 +37,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument('--confidence', type=float, default=0.5, help='Inference confidence threshold')
     parser.add_argument('--csv', action='store_true', help='Save detections in CSV format')
     parser.add_argument('--save', action='store_true', help='Save output video')
+    parser.add_argument('--times', action='store_true', help='print and save measured subprocess times in miliseconds')
 
     return parser.parse_args()
 
@@ -99,7 +100,7 @@ def main(config: ProcessConfig) -> None:
     time_start = datetime.datetime.now()
     video_stream.start()
     try:
-        with Live(progress_table(frame_number, source_info.total_frames, 0), refresh_per_second=30) as live:
+        with Live(progress_table(frame_number, source_info.total_frames, 0, None), refresh_per_second=30) as live:
             while video_stream.more() if source_info.source_type == 'file' else True:
                 fps_monitor.tick()
                 fps_value = fps_monitor.fps()
@@ -137,18 +138,15 @@ def main(config: ProcessConfig) -> None:
                     results_saver.save_video(filename=source_info.source_name, image=annotated_image)
 
                 # Presentar progreso en la terminal
-                # if config.times:
-                #     process_timer.add_measurement('capture', t_frame_start, t_capture_end)
-                #     process_timer.add_measurement('inference', t_inference_start, t_inference_end)
-                #     process_timer.add_measurement('total', t_frame_start, t_frame_end)
-                #     results_saver.save_timers(filename=source_info.source_name, timers=process_timer.times, frame_number=frame_number)
+                if config.times:
+                    process_timer.add_measurement('capture', t_frame_start, t_capture_end)
+                    process_timer.add_measurement('inference', t_inference_start, t_inference_end)
+                    process_timer.add_measurement('total', t_frame_start, t_frame_end)
+                    # results_saver.save_timers(filename=source_info.source_name, timers=process_timer.times, frame_number=frame_number)
 
-                #     times_message(frame_number, source_info.total_frames, fps_value, process_timer.times)
-                # else:
-                    # progress_message(frame_number, source_info.total_frames, fps_value)
-
-                
-                live.update(progress_table(frame_number, source_info.total_frames, fps_value))
+                    live.update(progress_table(frame_number, source_info.total_frames, fps_value, process_timer.times))
+                else:
+                    live.update(progress_table(frame_number, source_info.total_frames, fps_value, None))
 
                 frame_number += 1
 
