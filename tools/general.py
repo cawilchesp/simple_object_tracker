@@ -4,7 +4,7 @@ from collections import deque
 from modules.capture import VideoInfo
 
 
-def initialize_display(source_info: VideoInfo, noshow: bool = True) -> tuple[int, int]:
+def initialize_display(source_info: VideoInfo, preview: bool = True) -> tuple[int, int]:
     """Initialize display window settings
     Args:
         source_info (VideoInfo): Information about the video source.
@@ -12,7 +12,7 @@ def initialize_display(source_info: VideoInfo, noshow: bool = True) -> tuple[int
     Returns:
         tuple[int, int]: The width and height of the display window.
     """
-    if not noshow:
+    if preview:
         scaled_width = 1280 if source_info.width > 1280 else source_info.width
         scaled_height = int(scaled_width * source_info.height / source_info.width)
         scaled_height = scaled_height if source_info.height > scaled_height else source_info.height
