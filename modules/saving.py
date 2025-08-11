@@ -1,12 +1,11 @@
+from ultralytics.engine.results import Results
+
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Protocol, Any
-import datetime
-import json
+from typing import Optional, Protocol, Any
 import cv2
 import numpy as np
 import pandas as pd
-from ultralytics.engine.results import Results
 
 from modules.capture import VideoInfo
 
