@@ -6,9 +6,6 @@ import itertools
 from pathlib import Path
 from rich.live import Live
 
-# Third-party imports
-from icecream import ic
-
 # Local modules
 from modules.process_config import ProcessConfig, create_config
 from modules.capture import initialize_video_capture
@@ -19,7 +16,6 @@ from modules.annotation import Annotation
 # Local tools
 from tools.messages import step_message, source_message, progress_table
 from tools.general import initialize_display, FPSMonitor
-from tools.timing import ProcessTimer
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -39,13 +35,6 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# def process_frame():
-#     """
-#     Process a single frame of the video.
-#     """
-#     pass
-
-
 def main(config: ProcessConfig) -> None:
     # Initialize process counter
     step_count = itertools.count(1)
@@ -57,9 +46,10 @@ def main(config: ProcessConfig) -> None:
 
     # Initialize save results
     saver_config = SaveConfig(
-        output_dir=Path(config.output),
-        save_csv=config.csv,
-        save_video=config.save )
+        output_dir=Path(config.source).parent / 'output',
+        save_csv=config.save,
+        save_video=config.save,
+        tracking=config.track )
     results_saver = SaveResults(saver_config)
     results_saver.set_source_info(source_info=source_info)
     step_message(str(next(step_count)), "Saving Results Initialized :white_check_mark:")
@@ -94,7 +84,7 @@ def main(config: ProcessConfig) -> None:
     time_start = datetime.datetime.now()
     video_stream.start()
     try:
-        with Live(progress_table(frame_number, source_info.total_frames, 0, None), refresh_per_second=30) as live:
+        with Live(progress_table(frame_number, source_info.total_frames, 0), refresh_per_second=30) as live:
             while video_stream.more() if source_info.source_type == 'file' else True:
                 fps_monitor.tick()
                 fps_value = fps_monitor.fps()
@@ -114,15 +104,12 @@ def main(config: ProcessConfig) -> None:
                     annotated_image = annotator.on_detections(ultralytics_results=result, scene=annotated_image)
 
                 # Save results if enabled
-                if config.save == True:
-                    if config.track:
-                        results_saver.save_track(filename=source_info.source_name, results=result, frame_number=frame_number)
-                    else:
-                        results_saver.save_detect(filename=source_info.source_name, results=result, frame_number=frame_number)
+                if config.save:
+                    results_saver.save_csv(filename=source_info.source_name, results=result, frame_number=frame_number)
                     results_saver.save_video(filename=source_info.source_name, image=annotated_image)
 
                 # Presentar progreso en la terminal
-                live.update(progress_table(frame_number, source_info.total_frames, fps_value, None))
+                live.update(progress_table(frame_number, source_info.total_frames, fps_value))
 
                 frame_number += 1
 
