@@ -29,15 +29,12 @@ def parse_arguments() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(description="Video Object Tracker")
     parser.add_argument('--source', type=str, required=True, help='Video source (file path or camera index)')
-    parser.add_argument('--output', type=str, default=None, help='Custom output folder for results')
     parser.add_argument('--track', action='store_true', help='Enable tracking mode (default is detection mode)')
     parser.add_argument('--weights', type=str, default='yolo11m.pt', help='Model weights file name')
     parser.add_argument('--classes', nargs='+', type=int, help='Filter by class ID(s): --classes 0, or --classes 0 2 3')
     parser.add_argument('--size', type=int, default=640, help='Inference size in pixels')
     parser.add_argument('--confidence', type=float, default=0.5, help='Inference confidence threshold')
-    parser.add_argument('--csv', action='store_true', help='Save detections in CSV format')
     parser.add_argument('--save', action='store_true', help='Save output video')
-    parser.add_argument('--times', action='store_true', help='print and save measured subprocess times in miliseconds')
 
     return parser.parse_args()
 
@@ -79,24 +76,21 @@ def main(config: ProcessConfig) -> None:
         tracking=config.track )
     step_message(str(next(step_count)), f"{Path(config.weights).stem.upper()} Model Initialized :white_check_mark:")
 
-    # Cambiar tamaño de ventana de visualización
+    # Change live output window size
     window_width, window_height = initialize_display(source_info)
 
-    # Anotadores
+    # Annotators
     annotator = Annotation(
         fps=False,
         trace=True )
     step_message(str(next(step_count)), "Annotations Initialized :white_check_mark:")
 
-    # Medición de tiempos de procesamiento
-    process_timer = ProcessTimer(max_samples=50)
-
     # Variables
     frame_number = 0
     fps_monitor = FPSMonitor()
 
-    # Iniciar procesamiento de video
-    step_message(str(next(step_count)), "Video Processing Initialized :white_check_mark:")
+    # Video processing started
+    step_message(str(next(step_count)), "Video Processing Started :white_check_mark:")
     time_start = datetime.datetime.now()
     video_stream.start()
     try:
@@ -104,49 +98,31 @@ def main(config: ProcessConfig) -> None:
             while video_stream.more() if source_info.source_type == 'file' else True:
                 fps_monitor.tick()
                 fps_value = fps_monitor.fps()
-
-                t_frame_start = datetime.datetime.now()
                 
                 image = video_stream.read()
                 if image is None:
                     print()
                     break
-                
-                t_capture_end = datetime.datetime.now()
 
                 annotated_image = image.copy()
-
-                t_inference_start = datetime.datetime.now()
                 
-                # Inferencia
+                # Inference
                 results = yolo_tracker.inference(image=image)
-                
-                t_inference_end = datetime.datetime.now()
                     
-                # Dibujar anotaciones
+                # Draw annotations
                 for result in results:
                     annotated_image = annotator.on_detections(ultralytics_results=result, scene=annotated_image)
 
+                # Save results if enabled
                 if config.save == True:
-                    # Guardar resultados en csv
-                    t_frame_end = datetime.datetime.now()
                     if config.track:
                         results_saver.save_track(filename=source_info.source_name, results=result, frame_number=frame_number)
                     else:
                         results_saver.save_detect(filename=source_info.source_name, results=result, frame_number=frame_number)
-                    
                     results_saver.save_video(filename=source_info.source_name, image=annotated_image)
 
                 # Presentar progreso en la terminal
-                if config.times:
-                    process_timer.add_measurement('capture', t_frame_start, t_capture_end)
-                    process_timer.add_measurement('inference', t_inference_start, t_inference_end)
-                    process_timer.add_measurement('total', t_frame_start, t_frame_end)
-                    # results_saver.save_timers(filename=source_info.source_name, timers=process_timer.times, frame_number=frame_number)
-
-                    live.update(progress_table(frame_number, source_info.total_frames, fps_value, process_timer.times))
-                else:
-                    live.update(progress_table(frame_number, source_info.total_frames, fps_value, None))
+                live.update(progress_table(frame_number, source_info.total_frames, fps_value, None))
 
                 frame_number += 1
 
