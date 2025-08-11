@@ -11,9 +11,11 @@ from icecream import ic
 
 
 class Trace:
-    """Clase para almacenar los puntos de seguimiento de los objetos detectados.
+    """Class to store and manage object tracking points.
+    Attributes:
+        xy (defaultdict): Dictionary to store tracking points for each object.
     Args:
-        max_size (int): Tamaño máximo de la cola de seguimiento.
+        max_size (int): Maximum number of points to store for each object.
     """
     def __init__(
         self,
@@ -22,9 +24,10 @@ class Trace:
         self.xy = defaultdict(lambda: deque(maxlen=max_size))
 
     def add_points(self, xyxys: np.ndarray, tracker_ids: np.ndarray) -> None:
-        """Agrega los puntos de seguimiento a la cola de seguimiento.
+        """Adds tracking points for each object.
         Args:
-            detections (Detections): Resultados de la detección de objetos.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+            tracker_ids (np.ndarray): Tracking IDs of the objects.
         """
         for xyxy, tracker_id in zip(xyxys, tracker_ids):
             track_id = int(tracker_id)
@@ -33,21 +36,29 @@ class Trace:
             self.xy[track_id].append((center_x, center_y))
 
     def get_points(self, track_id: int) -> np.ndarray:
-        """Obtiene los puntos de seguimiento de un objeto específico.
+        """Returns the tracking points for a specific object.
         Args:
-            track_id (int): ID de seguimiento del objeto.
+            track_id (int): Tracking ID of the object.
         Returns:
-            np.ndarray: Puntos de seguimiento del objeto.
+            np.ndarray: Array of tracking points for the object.
         """
         return np.array(self.xy[track_id]).astype(np.int32) if track_id in self.xy else None
 
 
 class KeyPoints:
-    """Clase para almacenar los resultados de la detección de objetos.
+    """Class to store key points of detected objects.
     Args:
-        xy (np.ndarray): Coordenadas de las cajas delimitadoras.
-        class_id (np.ndarray): IDs de clase de los objetos detectados.
-        class_names (np.ndarray): Nombres de las clases de los objetos detectados.
+        xy (np.ndarray): Bounding box coordinates of the objects.
+        class_id (np.ndarray, optional): Class IDs of the objects.
+        confidence (np.ndarray, optional): Confidence scores of the detections.
+        tracker_id (np.ndarray, optional): Tracking IDs of the objects.
+        class_names (np.ndarray, optional): Names of the classes.
+    Attributes:
+        xy (np.ndarray): Bounding box coordinates of the objects.
+        class_id (np.ndarray): Class IDs of the objects.
+        confidence (np.ndarray): Confidence scores of the detections.
+        tracker_id (np.ndarray): Tracking IDs of the objects.
+        class_names (np.ndarray): Names of the classes.
     """
     def __init__(
         self,
@@ -243,6 +254,14 @@ class Annotation:
 
 
     def box_annotator(self, scene: np.ndarray, xyxys: np.ndarray, class_ids: np.ndarray) -> np.ndarray:
+        """Draws bounding boxes on the input image.
+        Args:
+            scene (np.array): Input image.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+            class_ids (np.ndarray): Class IDs of the objects.
+        Returns:
+            np.array: Image with bounding boxes.
+        """
         for xyxy, class_id in zip(xyxys, class_ids):
             x1, y1, x2, y2 = xyxy.astype(int)
             color = self.COLOR_LIST[class_id.astype(int) % len(self.COLOR_LIST)]
@@ -257,6 +276,15 @@ class Annotation:
     
     
     def label_annotator(self, scene: np.ndarray, xyxys: np.ndarray, class_ids: np.ndarray, labels: list) -> np.ndarray:
+        """Draws labels on the input image.
+        Args:
+            scene (np.array): Input image.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+            class_ids (np.ndarray): Class IDs of the objects.
+            labels (list): List of labels to draw.
+        Returns:
+            np.array: Image with labels.
+        """
         text_scale = 0.4
         text_thickness = 1
         for xyxy, class_id, label in zip(xyxys, class_ids, labels):
@@ -288,6 +316,15 @@ class Annotation:
    
    
     def trace_annotator(self, scene: np.ndarray, xyxys: np.ndarray, class_ids: np.ndarray, tracker_ids: np.ndarray) -> np.ndarray:
+        """Draws tracking traces on the input image.
+        Args:
+            scene (np.array): Input image.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+            class_ids (np.ndarray): Class IDs of the objects.
+            tracker_ids (np.ndarray): Tracking IDs of the objects.
+        Returns:
+            np.array: Image with tracking traces.
+        """
         self.trajectories.add_points(xyxys, tracker_ids)
         line_thickness = 1
         for xyxy, class_id, tracker_id in zip(xyxys, class_ids, tracker_ids):
@@ -306,6 +343,14 @@ class Annotation:
 
 
     def colorbox_annotator(self, scene: np.ndarray, xyxys: np.ndarray, class_ids: np.ndarray) -> np.ndarray:
+        """Draws colored boxes on the input image.
+        Args:
+            scene (np.array): Input image.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+            class_ids (np.ndarray): Class IDs of the objects.
+        Returns:
+            np.array: Image with colored boxes.
+        """
         scene_with_boxes = scene.copy()
         for xyxy, class_id in zip(xyxys, class_ids):
             x1, y1, x2, y2 = xyxy.astype(int)
@@ -328,6 +373,13 @@ class Annotation:
         return scene
 
     def heatmap_annotator(self, scene: np.ndarray, xyxys: np.ndarray) -> np.ndarray:
+        """Draws a heatmap on the input image.
+        Args:
+            scene (np.array): Input image.
+            xyxys (np.ndarray): Bounding box coordinates of the objects.
+        Returns:
+            np.array: Image with heatmap.
+        """
         if self.heat_mask is None:
             self.heat_mask = np.zeros(scene.shape[:2], dtype=np.float32)
         
