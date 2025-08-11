@@ -15,6 +15,7 @@ class ProcessConfig:
     confidence: float
     csv: bool
     save: bool
+    times: bool
 
 def create_config(root_path: Path, args) -> ProcessConfig:
     """Create configuration from command line arguments"""
@@ -27,5 +28,6 @@ def create_config(root_path: Path, args) -> ProcessConfig:
         size=args.size,
         confidence=args.confidence,
         csv=args.csv,
-        save=args.save
+        save=args.save,
+        times=args.times
     )
