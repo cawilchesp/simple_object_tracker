@@ -1,12 +1,7 @@
 from modules.capture import VideoInfo
-from pathlib import Path
 
 from rich import print, box
 from rich.table import Table, Column
-
-
-
-from icecream import ic
 
 
 def step_message(step: str = None, message: str = None) -> None:
@@ -39,6 +34,15 @@ def source_message(video_info: VideoInfo) -> None:
 
 
 def progress_table(frame_number: int, total_frames: int, fps_value: float, times: dict = None) -> Table:
+    """Create a progress table displaying frame number, FPS, time to end, and optional timing information.
+    Args:
+        frame_number (int): The current frame number.
+        total_frames (int): The total number of frames in the video.
+        fps_value (float): The current frames per second value.
+        times (dict, optional): A dictionary containing timing information for capture, inference, and total processing times.
+    Returns:
+        Table: A Rich table object containing the progress information.
+    """
     if total_frames is not None:
         percentage = f"[ {frame_number/total_frames:6.1%} ] "
         frame_progress = f"{frame_number} / {total_frames}"
