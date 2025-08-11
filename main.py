@@ -114,9 +114,9 @@ def main(config: ProcessConfig) -> None:
                 frame_number += 1
 
                 # View live results
-                cv2.namedWindow('Resultado', cv2.WINDOW_NORMAL)
-                cv2.resizeWindow('Resultado', window_width, window_height)
-                cv2.imshow("Resultado", annotated_image)
+                cv2.namedWindow('Output Preview', cv2.WINDOW_NORMAL)
+                cv2.resizeWindow('Output Preview', window_width, window_height)
+                cv2.imshow("Output Preview", annotated_image)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     print("\n")
                     break
