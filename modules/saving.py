@@ -15,6 +15,7 @@ class SaveConfig:
     output_dir: Path
     save_csv: bool = True
     save_video: bool = True
+    tracking: bool = False
 
 @dataclass
 class FolderPaths:
@@ -151,12 +152,10 @@ class SaveResults:
             return
         self.video_writer.write(filename, image)
 
-    def save_track(self, filename: str, results: Results, frame_number: int) -> None:
+    def save_csv(self, filename: str, results: Results, frame_number: int) -> None:
         if not self.config.save_csv:
             return
-        self.detection_writer.write_track(filename, results, frame_number)
-
-    def save_detect(self, filename: str, results: Results, frame_number: int) -> None:
-        if not self.config.save_csv:
-            return
-        self.detection_writer.write_detect(filename, results, frame_number)
+        if self.config.tracking:
+            self.detection_writer.write_track(filename, results, frame_number)
+        else:
+            self.detection_writer.write_detect(filename, results, frame_number)
