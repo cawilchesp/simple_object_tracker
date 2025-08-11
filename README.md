@@ -11,13 +11,14 @@
 
 ## Project Structure
 
-main.py # Entry point for running the tracker
-modules/ annotation.py # Annotation utilities 
-capture.py # Video/image capture logic 
-model_loader.py # Model loading and inference 
-process_config.py # Configuration processing 
-saving.py # Saving results and outputs 
-tools/ general.py # General utilities 
-messages.py # Messaging/logging helpers 
-timing.py # Timing and performance tools 
+- main.py # Entry point for running the tracker
+- modules/
+    - annotation.py # Annotation utilities 
+- capture.py # Video/image capture logic 
+- model_loader.py # Model loading and inference 
+- process_config.py # Configuration processing 
+- saving.py # Saving results and outputs 
+- tools/ general.py # General utilities 
+- messages.py # Messaging/logging helpers 
+- timing.py # Timing and performance tools 
 
