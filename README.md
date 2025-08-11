@@ -11,7 +11,7 @@
 
 ## Project Structure
 
-- main.py # Entry point for running the tracker
+- main.py: Entry point for running the tracker
 - modules/
     - annotation.py: Annotation utilities 
     - capture.py: Video/image capture logic 
