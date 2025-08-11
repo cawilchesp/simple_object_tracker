@@ -14,11 +14,25 @@
 - main.py # Entry point for running the tracker
 - modules/
     - annotation.py # Annotation utilities 
-- capture.py # Video/image capture logic 
-- model_loader.py # Model loading and inference 
-- process_config.py # Configuration processing 
-- saving.py # Saving results and outputs 
-- tools/ general.py # General utilities 
-- messages.py # Messaging/logging helpers 
-- timing.py # Timing and performance tools 
+    - capture.py # Video/image capture logic 
+    - model_loader.py # Model loading and inference 
+    - process_config.py # Configuration processing 
+    - saving.py # Saving results and outputs 
+- tools/
+    - general.py # General utilities 
+    - messages.py # Messaging/logging helpers 
+    - timing.py # Timing and performance tools 
 
+## Usage
+
+- Place your input videos or images in the appropriate directory.
+- Run `main.py` to start detection and tracking.
+
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Carlos Andrés Wilches Pérez
