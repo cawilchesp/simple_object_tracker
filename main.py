@@ -130,7 +130,7 @@ def main(config: ProcessConfig) -> None:
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # Carpeta raíz del proyecto
+    # Project root path
     root_path = Path(__file__).resolve().parent
 
     options = parse_arguments()
